@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><title>My Bookings</title></head>
+<body>
+  <h2>My Booked Events</h2>
+  <ul id="bookings"></ul>
+
+  <script>
+    const user = localStorage.getItem('loggedInUser');
+    if (!user) {
+      alert('Please login first');
+      window.location.href = 'login.html';
+    } else {
+      fetch(`http://localhost:8087/bookings/${user}`)
+      .then(r=>r.json())
+      .then(list=>{
+        const ul = document.getElementById('bookings');
+        if (list.length === 0) {
+          ul.innerHTML = '<li>No bookings yet.</li>';
+        } else {
+          list.forEach(b=>{
+            const li = document.createElement('li');
+            li.textContent = `${b.name} (${b.date} @ ${b.time})`;
+
+            ul.appendChild(li);
+          });
+        }
+      });
+    }
+  </script>
+</body>
+</html>

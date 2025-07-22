@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head><title>Book Event</title></head>
+<body>
+  <h2>Available Events</h2>
+  <ul id="events"></ul>
+
+  <script>
+    const user = localStorage.getItem('loggedInUser');
+    if (!user) {
+      alert('Please login first');
+      window.location.href = 'login.html';
+    } else {
+      fetch('http://localhost:8087/all')
+      .then(r=>r.json())
+      .then(list=>{
+        const ul = document.getElementById('events');
+        list.forEach(e=>{
+          const li = document.createElement('li');
+          li.textContent = `${e.name} (${e.date} @ ${e.time}) `;
+          const btn = document.createElement('button');
+          btn.textContent = 'Book';
+          btn.onclick = ()=>book(e);
+          li.appendChild(btn);
+          ul.appendChild(li);
+        });
+      });
+    }
+
+    function book(evt) {
+      fetch('http://localhost:8087/book', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+       body: JSON.stringify({
+  username: user,
+  name: evt.name,     // ← use "name" to match Booking.name
+  date: evt.date,
+  time: evt.time
+})
+
+      })
+      .then(r=>r.text())
+      .then(msg=>{
+        alert(msg);
+        window.location.href = 'my-bookings.html';
+      });
+    }
+  </script>
+</body>
+</html>
